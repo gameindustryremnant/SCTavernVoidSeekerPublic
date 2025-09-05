@@ -90,6 +90,7 @@
   { "id": "原始刺蛇", "race": "Neutral", "level": 2, "number": 5,  "value": 750 },
   { "id": "小捞油水", "race": "Neutral", "level": 2, "number": 4,  "value": 600 },
   
+  { "id": "回归起源", "race": "Neutral", "level": 3, "number": 5,  "value": 1800 },
   { "id": "鲜血猎手", "race": "Neutral", "level": 3, "number": 7,  "value": 950 },
   { "id": "暴掠龙", "race": "Neutral", "level": 3, "number": 3,  "value": 700 },
   { "id": "原始异龙", "race": "Neutral", "level": 3, "number": 4,  "value": 1000 },

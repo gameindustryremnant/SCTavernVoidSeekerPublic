@@ -50,6 +50,7 @@ const App = {
       raceRow: document.getElementById('raceRow'),
       levelRow: document.getElementById('levelRow'),
       cardSelect: document.getElementById('cardSelect'),
+      cardRow: document.getElementById('cardRow'),
       addGuessBtn: document.getElementById('addGuessBtn'),
       historyTableBody: document.querySelector('#historyTable tbody'),
       resetBtn: document.getElementById('resetBtn'),
@@ -179,8 +180,7 @@ const App = {
         id: String(id).trim(),
         race: race,
         level: level,
-        number: Number(cols[idx.number]),
-        value: Number(cols[idx.value])
+        number: Number(cols[idx.number]),        value: Number(cols[idx.value])
       };
     }).filter(c=>c.id && c.race && Number.isFinite(c.level) && c.level>=1 && c.level<=6 && Number.isFinite(c.number) && Number.isFinite(c.value));
   },
@@ -295,6 +295,7 @@ const App = {
 
   renderCardSelect(){
     const sel = this.els.cardSelect;
+    const cardRow = this.els.cardRow;
     const options = this.state.cards
       .filter(c=>{
         // filter by race and level first
@@ -312,6 +313,36 @@ const App = {
       const label = `${c.id}`;
       return `<option value="${c.id}">${label}</option>`;
     }).join('');
+
+    // Card row: only show if both race and level are selected
+    if(this.state.selectedRace && this.state.selectedLevel) {
+      const selectedCardId = sel.value;
+      cardRow.innerHTML = options.map(c =>
+        `<button type="button" class="card-btn${c.id===selectedCardId?' selected':''}" data-cardid="${c.id}">${c.id}</button>`
+      ).join('');
+      cardRow.querySelectorAll('button.card-btn').forEach(btn => {
+        btn.onclick = () => {
+          sel.value = btn.getAttribute('data-cardid');
+          // Highlight selected button
+          cardRow.querySelectorAll('button.card-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+        };
+      });
+      // Sync button highlight when cardSelect changes
+      sel.onchange = () => {
+        const val = sel.value;
+        cardRow.querySelectorAll('button.card-btn').forEach(btn => {
+          if(btn.getAttribute('data-cardid') === val) {
+            btn.classList.add('selected');
+          } else {
+            btn.classList.remove('selected');
+          }
+        });
+      };
+    } else {
+      cardRow.innerHTML = '';
+      sel.onchange = null;
+    }
   },
 
   renderHistory(){

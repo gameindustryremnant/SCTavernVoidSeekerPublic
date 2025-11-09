@@ -77,7 +77,7 @@
   { "id": "钢铁洪流", "race": "Terran", "level": 5, "number": 6, "value": 2100 },
   { "id": "泰凯斯", "race": "Terran", "level": 5, "number": 10,  "value": 1650 },
   { "id": "斯台特曼", "race": "Terran", "level": 5, "number": 6,  "value": 1275 },
-  { "id": "外籍军团", "race": "Terran", "level": 5, "number": 4,  "value": 1175 },
+  { "id": "外籍军团", "race": "Terran", "level": 5, "number": 4,  "value": 1650 },
   
   { "id": "沃菲尔德", "race": "Terran", "level": 6, "number": 5, "value": 750 },
   { "id": "游骑兵", "race": "Terran", "level": 6, "number": 2,  "value": 800 },

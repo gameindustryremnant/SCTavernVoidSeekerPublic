@@ -82,7 +82,9 @@ a:hover{text-decoration:underline}
   display: flex;
   gap: 8px;
   margin-bottom: 4px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 .race-btn, .level-btn {
   background: var(--panel);
@@ -92,6 +94,7 @@ a:hover{text-decoration:underline}
   padding: 6px 12px;
   cursor: pointer;
   font-size: 14px;
+  white-space: nowrap;
 }
 .race-btn.selected, .level-btn.selected {
   background: var(--accent);

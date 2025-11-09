@@ -47,8 +47,8 @@ const App = {
       expPack7Toggle: document.getElementById('expPack7Toggle'),
       expPack8Toggle: document.getElementById('expPack8Toggle'),
       datasetInfo: document.getElementById('datasetInfo'),
-      raceSelect: document.getElementById('raceSelect'),
-      levelSelect: document.getElementById('levelSelect'),
+      raceRow: document.getElementById('raceRow'),
+      levelRow: document.getElementById('levelRow'),
       cardSelect: document.getElementById('cardSelect'),
       addGuessBtn: document.getElementById('addGuessBtn'),
       historyTableBody: document.querySelector('#historyTable tbody'),
@@ -79,21 +79,8 @@ const App = {
     });
     // local file loader removed
     // search box removed
-    this.els.raceSelect.addEventListener('change', (e)=>{
-      this.state.selectedRace = e.target.value;
-      // Reset level when race changes
-      this.state.selectedLevel = '';
-      this.renderRaceLevelSelectors();
-      this.renderCardSelect();
-    });
-    this.els.levelSelect.addEventListener('change', (e)=>{
-      this.state.selectedLevel = e.target.value;
-      this.renderCardSelect();
-    });
-    this.els.sortSelect.addEventListener('change', (e)=>{
-      this.state.sortBy = e.target.value;
-      this.renderCandidates();
-    });
+    // Remove old select event listeners for raceSelect and levelSelect
+    // Race/level button events are handled in renderRaceLevelSelectors
     this.els.addGuessBtn.addEventListener('click', ()=>{
       const cardId = this.els.cardSelect.value;
       if(!cardId) return;
@@ -266,15 +253,24 @@ const App = {
   },
 
   renderRaceLevelSelectors(){
-    // Race options from available races in dataset
+    // Race buttons
     const racesInData = Array.from(new Set(this.state.cards.map(c=>c.race))).filter(Boolean);
-    const raceSel = this.els.raceSelect;
     const selectedRace = this.state.selectedRace && racesInData.includes(this.state.selectedRace) ? this.state.selectedRace : '';
-    raceSel.innerHTML = ['<option value="">任意种族</option>'].concat(
-      racesInData.sort((a,b)=>a.localeCompare(b)).map(r=>`<option value="${r}" ${r===selectedRace?'selected':''}>${r}</option>`)
-    ).join('');
+    this.els.raceRow.innerHTML =
+      `<button type="button" class="race-btn${!selectedRace?' selected':''}" data-race="">任意种族</button>` +
+      racesInData.sort((a,b)=>a.localeCompare(b)).map(r=>
+        `<button type="button" class="race-btn${r===selectedRace?' selected':''}" data-race="${r}">${r}</button>`
+      ).join('');
+    this.els.raceRow.querySelectorAll('button.race-btn').forEach(btn=>{
+      btn.onclick = (e)=>{
+        this.state.selectedRace = btn.getAttribute('data-race');
+        // Do NOT reset selectedLevel here
+        this.renderRaceLevelSelectors();
+        this.renderCardSelect();
+      };
+    });
 
-    // Level options based on selected race (or all levels if none selected)
+    // Level buttons
     const levelsSet = new Set(
       this.state.cards
         .filter(c=>!selectedRace || c.race===selectedRace)
@@ -282,11 +278,19 @@ const App = {
         .filter(v=>Number.isFinite(v))
     );
     const levels = Array.from(levelsSet).sort((a,b)=>a-b);
-    const levelSel = this.els.levelSelect;
     const selectedLevel = (this.state.selectedLevel && levels.includes(Number(this.state.selectedLevel))) ? String(this.state.selectedLevel) : '';
-    levelSel.innerHTML = ['<option value="">任意卡牌等级</option>'].concat(
-      levels.map(l=>`<option value="${l}" ${String(l)===selectedLevel?'selected':''}>${l}</option>`)
-    ).join('');
+    this.els.levelRow.innerHTML =
+      `<button type="button" class="level-btn${!selectedLevel?' selected':''}" data-level="">任意等级</button>` +
+      levels.map(l=>
+        `<button type="button" class="level-btn${String(l)===selectedLevel?' selected':''}" data-level="${l}">${l}</button>`
+      ).join('');
+    this.els.levelRow.querySelectorAll('button.level-btn').forEach(btn=>{
+      btn.onclick = (e)=>{
+        this.state.selectedLevel = btn.getAttribute('data-level');
+        this.renderRaceLevelSelectors();
+        this.renderCardSelect();
+      };
+    });
   },
 
   renderCardSelect(){

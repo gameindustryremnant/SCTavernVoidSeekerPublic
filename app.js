@@ -108,31 +108,9 @@ const App = {
       }
     });
   },
-
-  async handleLoadSet(key){
-    if(this.state.cards.length>0 || this.state.guesses.length>0){
-      const ok = confirm('Load a new card set? This will clear current guesses.');
-      if(!ok) return;
-    }
-    const path = BUILTIN_SET_FILES[key];
-    try{
-      const res = await fetch(path, { cache: 'no-cache' });
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      const cards = await res.json();
-      this.setCards(cards);
-    }catch(err){
-      console.error('Failed to load dataset', err);
-      alert('Failed to load dataset. If you opened this file directly, please run a local web server or deploy to GitHub Pages.');
-      this.els.datasetInfo.textContent = 'Load failed';
-      return;
-    }
-    // reset filters and render
-    this.state.selectedRace = '';
-    this.state.selectedLevel = '';
-    this.renderAll();
-  },
-
+  
   async handleCombineSets(){
+    this.els.datasetInfo.textContent = 'Loading...';
     // core is mandatory
     const selectedKeys = ['core'];
     if(this.els.expPack1Toggle && this.els.expPack1Toggle.checked) selectedKeys.push('expPack1');
@@ -148,33 +126,39 @@ const App = {
       const datasets = await Promise.all(selectedKeys.map(async (k)=>{
         const res = await fetch(BUILTIN_SET_FILES[k], { cache:'no-cache' });
         if(!res.ok) throw new Error(`HTTP ${res.status} for ${k}`);
-        const cards = await res.json();
-        // Add isCoreSet property
+        const data = await res.json();
+        // Only support {name, cards} format
+        const cards = data.cards;
         cards.forEach(card => {
           card.isCoreSet = (k === 'core');
         });
-        return cards;
+        return { cards, name: data.name || k };
       }));
       // merge and de-duplicate by id
       const mergedMap = new Map();
-      datasets.flat().forEach(card=>{
+      datasets.flatMap(d=>d.cards).forEach(card=>{
         mergedMap.set(String(card.id), card);
       });
       const merged = Array.from(mergedMap.values());
-      this.setCards(merged);
+      const packNames = datasets.map(d=>d.name).filter(Boolean);
+      this.setCards(merged, packNames);
       this.state.selectedRace = '';
       this.state.selectedLevel = '';
       this.renderAll();
     }catch(err){
+      this.els.datasetInfo.textContent = 'Loading failed';
       console.error('Failed to load selected packs', err);
       alert('Failed to load selected packs. Ensure you are serving the site via a local server or GitHub Pages.');
     }
   },
 
+  // Load from file. Not in use.
   async loadFile(file){
     const text = await file.text();
     if(file.name.endsWith('.json')){
-      const cards = JSON.parse(text);
+      const data = JSON.parse(text);
+      // Only support {name, cards} format
+      const cards = data.cards;
       this.setCards(cards);
     } else if(file.name.endsWith('.csv')){
       const cards = this.parseCsv(text);
@@ -214,7 +198,7 @@ const App = {
     }).filter(c=>c.id && c.race && Number.isFinite(c.level) && c.level>=1 && c.level<=6 && Number.isFinite(c.number) && Number.isFinite(c.value));
   },
 
-  setCards(cards){
+  setCards(cards, packNames){
     // normalize
     const normalized = cards.map(c=>{
       const race = normalizeRace(String(c.race));
@@ -233,7 +217,8 @@ const App = {
     this.state.guesses = [];
     this.persist();
     this.renderAll();
-    this.els.datasetInfo.textContent = `total:${this.state.cards.length}  ${dropped>0?` (${dropped} invalid dropped)`:''}`;
+    const packsText = Array.isArray(packNames) && packNames.length ? `牌组: ${packNames.join(', ')}` : '';
+    this.els.datasetInfo.textContent = `${packsText} 已载入 总卡牌数:${this.state.cards.length} ${dropped>0?` (${dropped} invalid dropped)`:''}`;
   },
 
   addGuess(cardId, feedback){

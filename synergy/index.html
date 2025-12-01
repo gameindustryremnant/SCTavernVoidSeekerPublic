@@ -26,7 +26,6 @@
                     <label><input type="checkbox" id="expPack5Toggle"> 重装上阵</label>
                     <label><input type="checkbox" id="expPack6Toggle"> 穷兵黩武</label>
                     <label><input type="checkbox" id="expPack7Toggle"> 一念之差</label>
-                    <label><input type="checkbox" id="expPack8Toggle"> 牧场之战</label>
                 </div>
                 <div id="datasetInfo" class="info-text"></div>
             </div>
@@ -70,7 +69,13 @@
     <script src="https://unpkg.com/three@r132/build/three.min.js"></script>
     <script src="https://unpkg.com/3d-force-graph/dist/3d-force-graph.min.js"></script>
 
-    <!-- Application Script -->
+    <!-- Module Scripts (in dependency order) -->
+    <script src="dataLoader.js"></script>
+    <script src="synergyRules.js"></script>
+    <script src="synergyWeighter.js"></script>
+    <script src="graphBuilder.js"></script>
+
+    <!-- Main Application Script -->
     <script src="app.js"></script>
     <script>
         window.addEventListener('DOMContentLoaded', () => {

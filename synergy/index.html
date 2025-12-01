@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星际酒馆卡牌协同分析工具</title>
+    <link rel="stylesheet" href="app.css">
+</head>
+<body>
+    <header class="synergy-header">
+        <h1>星际酒馆卡牌协同分析工具</h1>
+        <p class="subtitle">3D协同关系可视化</p>
+    </header>
+
+    <div class="synergy-container">
+        <!-- Control Panel -->
+        <aside class="control-panel">
+            <div class="control-section">
+                <h3>数据集选择</h3>
+                <div class="dataset-controls">
+                    <label><input type="checkbox" id="coreToggle" checked disabled> 核心</label>
+                    <label><input type="checkbox" id="expPack1Toggle"> 军备竞赛</label>
+                    <label><input type="checkbox" id="expPack2Toggle"> 作战计划</label>
+                    <label><input type="checkbox" id="expPack3Toggle"> 卷土重来</label>
+                    <label><input type="checkbox" id="expPack4Toggle"> 时不我待</label>
+                    <label><input type="checkbox" id="expPack5Toggle"> 重装上阵</label>
+                    <label><input type="checkbox" id="expPack6Toggle"> 穷兵黩武</label>
+                    <label><input type="checkbox" id="expPack7Toggle"> 一念之差</label>
+                    <label><input type="checkbox" id="expPack8Toggle"> 牧场之战</label>
+                </div>
+                <div id="datasetInfo" class="info-text"></div>
+            </div>
+
+            <div class="control-section">
+                <h3>筛选</h3>
+                <div class="filter-controls">
+                    <label for="raceFilter">种族:</label>
+                    <select id="raceFilter"></select>
+                </div>
+                <div class="filter-controls">
+                    <label for="tagFilter">标签:</label>
+                    <select id="tagFilter"></select>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <div id="statsPanel" class="stats-info"></div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- 3D Graph Container -->
+            <div id="graphContainer" class="graph-container"></div>
+
+            <!-- Card Details Panel -->
+            <div id="cardDetails" class="card-details-panel">
+                <div class="placeholder">
+                    <p>点击3D图中的卡牌节点以查看详细信息</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="synergy-footer">
+        <p>3D协同分析 | 基于加权标签和自定义规则计算</p>
+    </footer>
+
+    <!-- 3d-force-graph Library -->
+    <script src="https://unpkg.com/three@r132/build/three.min.js"></script>
+    <script src="https://unpkg.com/3d-force-graph/dist/3d-force-graph.min.js"></script>
+
+    <!-- Application Script -->
+    <script src="app.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.SynergyApp) {
+                window.SynergyApp.init();
+            }
+        });
+    </script>
+</body>
+</html>

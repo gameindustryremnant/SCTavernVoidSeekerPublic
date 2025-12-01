@@ -8,15 +8,15 @@ const RACES = ["Protess","Zerg","Terran","Neutral"];
 
 // Built-in dataset file paths
 const BUILTIN_SET_FILES = {
-  core: 'data/core.json',
-  expPack1: 'data/pack1JunBeiJingSai.json',
-  expPack2: 'data/pack2ZuoZhanJiHua.json',
-  expPack3: 'data/pack3JuanTuChongLai.json',
-  expPack4: 'data/pack4ShiBuWoDai.json', 
-  expPack5: 'data/pack5ChongZhuangShangZhen.json',
-  expPack6: 'data/pack6QiongBingDuWu.json',
-  expPack7: 'data/pack7YiNianZhiCha.json',
-  expPack8: 'data/pack8MuChangZhiZhan.json'
+  core: 'TempData/core.json',
+  expPack1: 'TempData/pack1JunBeiJingSai.json',
+  expPack2: 'TempData/pack2ZuoZhanJiHua.json',
+  expPack3: 'TempData/pack3JuanTuChongLai.json',
+  expPack4: 'TempData/pack4ShiBuWoDai.json', 
+  expPack5: 'TempData/pack5ChongZhuangShangZhen.json',
+  expPack6: 'TempData/pack6QiongBingDuWu.json',
+  expPack7: 'TempData/pack7YiNianZhiCha.json',
+  expPack8: 'TempData/pack8MuChangZhiZhan.json'
 };
 
 const App = {

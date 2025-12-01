@@ -34,7 +34,6 @@ const SynergyApp = {
       expPack5Toggle: document.getElementById("expPack5Toggle"),
       expPack6Toggle: document.getElementById("expPack6Toggle"),
       expPack7Toggle: document.getElementById("expPack7Toggle"),
-      expPack8Toggle: document.getElementById("expPack8Toggle"),
       datasetInfo: document.getElementById("datasetInfo"),
       raceFilter: document.getElementById("raceFilter"),
       tagFilter: document.getElementById("tagFilter"),
@@ -53,8 +52,7 @@ const SynergyApp = {
       ["expPack4", this.els.expPack4Toggle],
       ["expPack5", this.els.expPack5Toggle],
       ["expPack6", this.els.expPack6Toggle],
-      ["expPack7", this.els.expPack7Toggle],
-      ["expPack8", this.els.expPack8Toggle]
+      ["expPack7", this.els.expPack7Toggle]
     ];
     toggles.forEach(([key, el]) => {
       if (!el) return;

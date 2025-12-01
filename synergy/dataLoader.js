@@ -47,8 +47,7 @@ const DataLoader = {
       4: "../data/pack4ShiBuWoDai.json",
       5: "../data/pack5ChongZhuangShangZhen.json",
       6: "../data/pack6QiongBingDuWu.json",
-      7: "../data/pack7YiNianZhiCha.json",
-      8: "../data/pack8MuChangZhiZhan.json"
+      7: "../data/pack7YiNianZhiCha.json"
     };
 
     const file = packFiles[packIndex];

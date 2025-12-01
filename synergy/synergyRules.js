@@ -79,10 +79,25 @@ const SynergyRules = {
    * @returns {number} Raw synergy points (before multiplier weighting)
    */
   calculateSynergy(card1, card2, tags1, tags2) {
-    let totalSynergy = 0;
+    // Ensure tag values used for numeric calculations are numbers.
+    // Some tag sources include non-numeric entries (e.g. "pack": "核心").
+    // Convert numeric-like values to numbers and treat others as 0 to avoid NaN.
+    const normalizeTags = (tags) => {
+      const out = {};
+      for (const k in tags) {
+        const v = tags[k];
+        const n = Number(v);
+        out[k] = Number.isFinite(n) ? n : 0;
+      }
+      return out;
+    };
 
+    const nTags1 = normalizeTags(tags1 || {});
+    const nTags2 = normalizeTags(tags2 || {});
+
+    let totalSynergy = 0;
     for (const ruleObj of this.rules) {
-      const synergy = ruleObj.calculate(card1, card2, tags1, tags2);
+      const synergy = ruleObj.calculate(card1, card2, nTags1, nTags2);
       totalSynergy += synergy;
     }
 

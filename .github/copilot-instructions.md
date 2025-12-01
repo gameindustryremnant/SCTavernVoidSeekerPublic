@@ -45,4 +45,3 @@ If something's unclear
 - Ask for clarification about desired UX changes (e.g., what "close" should mean) and whether adding a simple build/test pipeline is acceptable.
 
 ---
-If you'd like, I can also add a small `CONTRIBUTING.md` or a debug helper in `app.js` to make future PRs easier. What should I add next?

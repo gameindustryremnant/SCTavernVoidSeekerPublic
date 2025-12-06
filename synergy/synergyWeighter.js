@@ -15,7 +15,7 @@ const SynergyWeighter = {
       description: "Terran race weight: bonus for two Terran cards",
       calculate: (card1, card2, tags1, tags2) => {
         if (card1.race === "Terran" && card2.race === "Terran") {
-          return 20;
+          return 00;
         }
         return 0;
       }
@@ -52,7 +52,7 @@ const SynergyWeighter = {
       description: "Zerg race weight: bonus for two Zerg cards",
       calculate: (card1, card2, tags1, tags2) => {
         if (card1.race === "Zerg" && card2.race === "Zerg") {
-          return 20;
+          return 0;
         }
         return 0;
       }
@@ -62,7 +62,7 @@ const SynergyWeighter = {
       description: "Neutral race weight: bonus for two Neutral cards",
       calculate: (card1, card2, tags1, tags2) => {
         if (card1.race === "Neutral" && card2.race === "Neutral") {
-          return 20;
+          return 0;
         }
         return 0;
       }
@@ -72,9 +72,18 @@ const SynergyWeighter = {
       description: "Protess race weight: bonus for two Protess cards",
       calculate: (card1, card2, tags1, tags2) => {
         if (card1.race === "Protess" && card2.race === "Protess") {
-          return 20;
+          return 0;
         }
         return 0;
+      }
+    },
+    {
+      rule: "刷牌",
+      description: "刷牌 weight: sum of 刷牌 tag values",
+      calculate: (card1, card2, tags1, tags2) => {
+        const val1 = tags1["刷牌"] || 0;
+        const val2 = tags2["刷牌"] || 0;
+        return val1 + val2;
       }
     }
   ],
@@ -154,7 +163,7 @@ const SynergyWeighter = {
     }
 
     // Calculate synergy points for all card pairs using their corresponding weight rule
-    for (const {pair, ruleName} of cardPairsWithRules) {
+    for (const { pair, ruleName } of cardPairsWithRules) {
       const [card1Id, card2Id] = pair.split('|');
 
       const card1 = allCards.find(c => c.id === card1Id);

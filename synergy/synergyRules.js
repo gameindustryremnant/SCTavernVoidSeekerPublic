@@ -53,6 +53,15 @@ const SynergyRules = {
         return allCards.filter(card => card.race === "Zerg");
       }
     },
+
+    {
+      rule: "Protess_race",
+      description: "Protess race synergy: cards with Protess race",
+      match: (allCards, cardTagsMap) => {
+        return allCards.filter(card => card.race === "Protess");
+      }
+    },
+
     {
       rule: "Neutral_race",
       description: "Neutral race synergy: cards with Neutral race",
@@ -61,10 +70,13 @@ const SynergyRules = {
       }
     },
     {
-      rule: "Protess_race",
-      description: "Protess race synergy: cards with Protess race",
+      rule: "刷牌",
+      description: "刷牌 synergy: cards with 刷牌 tag",
       match: (allCards, cardTagsMap) => {
-        return allCards.filter(card => card.race === "Protess");
+        return allCards.filter(card => {
+          const tags = cardTagsMap[card.id] || {};
+          return tags["刷牌"];
+        });
       }
     }
   ],
@@ -109,7 +121,7 @@ const SynergyRules = {
       }
     }
     return results;
-  } 
+  }
 };
 
 // Global export

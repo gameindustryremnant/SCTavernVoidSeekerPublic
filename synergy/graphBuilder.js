@@ -46,23 +46,42 @@ const GraphBuilder = {
    * @returns {Array} Array of link objects for the graph
    */
   buildLinks(synergies) {
-    const maxLinksPerCard = 5;
-    const linkSet = new Set();
-    const links = [];
+    const maxLinksPerCard = 20;
+    const linkMap = new Map(); // Use cardPair as key to merge synergies
+    let maxSynergyPoints = 0;
 
+    // First pass: aggregate synergies by card pair
     for (const cardId in synergies) {
       const synergyList = synergies[cardId].slice(0, maxLinksPerCard);
       for (const synergy of synergyList) {
         const linkKey = [cardId, synergy.targetId].sort().join("-");
-        if (!linkSet.has(linkKey) && synergy.points > 0) {
-          linkSet.add(linkKey);
-          links.push({
+        
+        if (!linkMap.has(linkKey)) {
+          linkMap.set(linkKey, {
             source: cardId,
             target: synergy.targetId,
-            value: Math.min(5, synergy.points / 10) // Normalize strength for visualization
+            totalPoints: 0
           });
         }
+        
+        const linkData = linkMap.get(linkKey);
+        linkData.totalPoints += synergy.points;
+        maxSynergyPoints = Math.max(maxSynergyPoints, linkData.totalPoints);
       }
+    }
+
+    // Second pass: create final links with consistent width and distance based on total synergy
+    const links = [];
+    for (const linkData of linkMap.values()) {
+      // Normalize distance (shorter for higher synergy): 10 to 50
+      const distance = 50 - (linkData.totalPoints / maxSynergyPoints) * 40;
+      links.push({
+        source: linkData.source,
+        target: linkData.target,
+        distance: distance,
+        width: 1, // All links have the same width
+        points: linkData.totalPoints
+      });
     }
 
     return links;

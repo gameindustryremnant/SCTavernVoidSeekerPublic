@@ -10,6 +10,13 @@ const SynergyRules = {
    */
   rules: [
     {
+      rule: "Terran_race",
+      description: "Terran race synergy: cards with Terran race",
+      match: (allCards, cardTagsMap) => {
+        return allCards.filter(card => card.race === "Terran");
+      }
+    },
+    {
       rule: "任务流",
       description: "Task Chain synergy: cards with 人族任务流 or 人族任务流核心 tags",
       match: (allCards, cardTagsMap) => {
@@ -20,38 +27,44 @@ const SynergyRules = {
       }
     },
     {
-      rule: "same_race",
-      description: "Same-race synergy: cards of the same race",
-      match: (allCards, cardTagsMap, focusCard) => {
-        if (!focusCard) return [];
-        return allCards.filter(card => card.race === focusCard.race);
-      }
-    },
-    {
-      rule: "shared_tag",
-      description: "Shared tag synergy: cards sharing a common tag",
-      match: (allCards, cardTagsMap, focusCard) => {
-        if (!focusCard) return [];
-        const focusTags = cardTagsMap[focusCard.id] || {};
-        return allCards.filter(card => {
-          const cardTags = cardTagsMap[card.id] || {};
-          for (const tag in focusTags) {
-            if (tag in cardTags && tag !== focusCard.race && tag !== "pack") {
-              return true;
-            }
-          }
-          return false;
-        });
-      }
-    },
-    {
-      rule: "air_superiority",
-      description: "Air superiority synergy: cards with 飞行 tag",
+      rule: "人族生化",
+      description: "Terran Biotech synergy: cards with 人族生化 tag",
       match: (allCards, cardTagsMap) => {
         return allCards.filter(card => {
           const tags = cardTagsMap[card.id] || {};
-          return tags["飞行"];
+          return tags["人族生化"];
         });
+      }
+    },
+    {
+      rule: "人族机械化",
+      description: "Terran Mechanization synergy: cards with 人族机械化 tag",
+      match: (allCards, cardTagsMap) => {
+        return allCards.filter(card => {
+          const tags = cardTagsMap[card.id] || {};
+          return tags["人族机械化"];
+        });
+      }
+    },
+    {
+      rule: "Zerg_race",
+      description: "Zerg race synergy: cards with Zerg race",
+      match: (allCards, cardTagsMap) => {
+        return allCards.filter(card => card.race === "Zerg");
+      }
+    },
+    {
+      rule: "Neutral_race",
+      description: "Neutral race synergy: cards with Neutral race",
+      match: (allCards, cardTagsMap) => {
+        return allCards.filter(card => card.race === "Neutral");
+      }
+    },
+    {
+      rule: "Protess_race",
+      description: "Protess race synergy: cards with Protess race",
+      match: (allCards, cardTagsMap) => {
+        return allCards.filter(card => card.race === "Protess");
       }
     }
   ],

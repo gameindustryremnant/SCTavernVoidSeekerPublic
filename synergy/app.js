@@ -113,38 +113,15 @@ const SynergyApp = {
    * Calculate all synergies using SynergyRules and SynergyWeighter modules
    */
   calculateAllSynergies() {
-    // Initialize synergies structure
-    this.state.synergies = {};
+    // Step 1: Find all cards matching each synergy rule
+    const ruleMatches = window.SynergyRules.findAllMatches(this.state.cards, this.state.cardTags);
 
-    // For each card, calculate pairwise synergies with all other cards
-    for (let i = 0; i < this.state.cards.length; i++) {
-      const card1 = this.state.cards[i];
-      const tags1 = this.state.cardTags[card1.id] || {};
-
-      if (!this.state.synergies[card1.id]) {
-        this.state.synergies[card1.id] = [];
-      }
-
-      for (let j = 0; j < this.state.cards.length; j++) {
-        if (i === j) continue; // Skip self-comparison
-
-        const card2 = this.state.cards[j];
-        const tags2 = this.state.cardTags[card2.id] || {};
-
-        // Calculate pairwise synergy using weight rules
-        const synergy = window.SynergyWeighter.calculatePairSynergy(card1, card2, tags1, tags2);
-
-        if (synergy > 0) {
-          this.state.synergies[card1.id].push({
-            targetId: card2.id,
-            points: synergy
-          });
-        }
-      }
-
-      // Sort by synergy points descending
-      this.state.synergies[card1.id].sort((a, b) => b.points - a.points);
-    }
+    // Step 2: Calculate synergies from matched rule pairs
+    this.state.synergies = window.SynergyWeighter.calculateSynergiesFromRules(
+      this.state.cards,
+      this.state.cardTags,
+      ruleMatches
+    );
 
     console.log("Synergies calculated:", this.state.synergies);
 
@@ -254,11 +231,14 @@ const SynergyApp = {
       .nodeColor(node => node.color)
       .nodeVal(node => node.val)
       .nodeLabel(node => `${node.label} (${node.race}, Lv${node.level})`)
-      .linkWidth(link => link.value || 1)
+      .linkWidth(link => link.width || 1)
       .linkColor(() => "rgba(200,200,200,0.3)")
       .onNodeClick(node => {
         this.showCardDetails(node.id);
       });
+    
+    // Configure link distance using d3Force
+    graph.d3Force('link').distance(link => link.distance || 30);
   },
 
   showCardDetails(cardId) {
@@ -267,6 +247,37 @@ const SynergyApp = {
 
     const tags = this.state.cardTags[cardId] || {};
     const synergies = this.state.synergies[cardId] || [];
+
+    // Build a map of aggregated synergies between card pairs
+    const aggregatedSynergies = new Map();
+    
+    // Add synergies where this card is the source
+    for (const syn of synergies) {
+      const key = [cardId, syn.targetId].sort().join("-");
+      if (!aggregatedSynergies.has(key)) {
+        aggregatedSynergies.set(key, { targetId: syn.targetId, points: 0 });
+      }
+      aggregatedSynergies.get(key).points += syn.points;
+    }
+    
+    // Add synergies where this card is the target (from other cards)
+    for (const otherCardId in this.state.synergies) {
+      if (otherCardId === cardId) continue;
+      const otherSynergies = this.state.synergies[otherCardId];
+      for (const syn of otherSynergies) {
+        if (syn.targetId === cardId) {
+          const key = [otherCardId, cardId].sort().join("-");
+          if (!aggregatedSynergies.has(key)) {
+            aggregatedSynergies.set(key, { targetId: otherCardId, points: 0 });
+          }
+          aggregatedSynergies.get(key).points += syn.points;
+        }
+      }
+    }
+
+    // Convert to array and sort by points descending
+    const aggregatedArray = Array.from(aggregatedSynergies.values())
+      .sort((a, b) => b.points - a.points);
 
     let html = `
       <div class="card-detail">
@@ -291,8 +302,8 @@ const SynergyApp = {
         <div class="rule-synergies-list">
     `;
 
-    if (synergies.length > 0) {
-      synergies.slice(0, 5).forEach(syn => {
+    if (aggregatedArray.length > 0) {
+      aggregatedArray.slice(0, 10).forEach(syn => {
         const targetCard = this.state.cards.find(c => c.id === syn.targetId);
         if (targetCard) {
           html += `<div class="rule-synergy-item">

@@ -11,6 +11,16 @@ const SynergyWeighter = {
    */
   weightRules: [
     {
+      rule: "Terran_race",
+      description: "Terran race weight: bonus for two Terran cards",
+      calculate: (card1, card2, tags1, tags2) => {
+        if (card1.race === "Terran" && card2.race === "Terran") {
+          return 20;
+        }
+        return 0;
+      }
+    },
+    {
       rule: "任务流",
       description: "Task Chain weight: 人族任务流 tag value + 人族任务流核心 * 2",
       calculate: (card1, card2, tags1, tags2) => {
@@ -19,15 +29,52 @@ const SynergyWeighter = {
         return val1 + val2;
       }
     },
- 
- 
     {
-      rule: "same_race",
-      description: "Same race weight: race bonus for cards of same race",
+      rule: "人族生化",
+      description: "Terran Biotech weight: sum of 人族生化 tag values",
       calculate: (card1, card2, tags1, tags2) => {
-        if (card1.race !== card2.race) return 0;
-        // Base bonus for same race match
-        return 50;
+        const val1 = tags1["人族生化"] || 0;
+        const val2 = tags2["人族生化"] || 0;
+        return val1 + val2;
+      }
+    },
+    {
+      rule: "人族机械化",
+      description: "Terran Mechanization weight: sum of 人族机械化 tag values",
+      calculate: (card1, card2, tags1, tags2) => {
+        const val1 = tags1["人族机械化"] || 0;
+        const val2 = tags2["人族机械化"] || 0;
+        return val1 + val2;
+      }
+    },
+    {
+      rule: "Zerg_race",
+      description: "Zerg race weight: bonus for two Zerg cards",
+      calculate: (card1, card2, tags1, tags2) => {
+        if (card1.race === "Zerg" && card2.race === "Zerg") {
+          return 20;
+        }
+        return 0;
+      }
+    },
+    {
+      rule: "Neutral_race",
+      description: "Neutral race weight: bonus for two Neutral cards",
+      calculate: (card1, card2, tags1, tags2) => {
+        if (card1.race === "Neutral" && card2.race === "Neutral") {
+          return 20;
+        }
+        return 0;
+      }
+    },
+    {
+      rule: "Protess_race",
+      description: "Protess race weight: bonus for two Protess cards",
+      calculate: (card1, card2, tags1, tags2) => {
+        if (card1.race === "Protess" && card2.race === "Protess") {
+          return 20;
+        }
+        return 0;
       }
     }
   ],
@@ -75,6 +122,90 @@ const SynergyWeighter = {
       description: description,
       calculate: calculateFunction
     });
+  },
+
+  /**
+   * Calculate synergies for all card pairs matched by synergy rules
+   * @param {Array} allCards - All cards in the dataset
+   * @param {Object} cardTagsMap - Mapping of cardId -> tags
+   * @param {Object} ruleMatches - Result from SynergyRules.findAllMatches()
+   * @returns {Object} Synergies object: cardId -> array of {targetId, points}
+   */
+  calculateSynergiesFromRules(allCards, cardTagsMap, ruleMatches) {
+    const synergies = {};
+    const cardPairsWithRules = []; // Array of {pair, ruleName}
+
+    // Build a list of card pairs with their corresponding rule names
+    for (const ruleName in ruleMatches) {
+      const matchedCards = ruleMatches[ruleName];
+
+      // For each rule, add all pairwise combinations of matched cards
+      for (let i = 0; i < matchedCards.length; i++) {
+        for (let j = i + 1; j < matchedCards.length; j++) {
+          const card1Id = matchedCards[i].id;
+          const card2Id = matchedCards[j].id;
+
+          cardPairsWithRules.push({
+            pair: `${card1Id}|${card2Id}`,
+            ruleName: ruleName
+          });
+        }
+      }
+    }
+
+    // Calculate synergy points for all card pairs using their corresponding weight rule
+    for (const {pair, ruleName} of cardPairsWithRules) {
+      const [card1Id, card2Id] = pair.split('|');
+
+      const card1 = allCards.find(c => c.id === card1Id);
+      const card2 = allCards.find(c => c.id === card2Id);
+
+      if (!card1 || !card2) continue;
+
+      const tags1 = cardTagsMap[card1Id] || {};
+      const tags2 = cardTagsMap[card2Id] || {};
+
+      // Find and apply the corresponding weight rule
+      const weightRule = this.weightRules.find(r => r.rule === ruleName);
+      if (!weightRule) {
+        console.warn(`Weight rule "${ruleName}" not found`);
+        continue;
+      }
+
+      let synergy = 0;
+      try {
+        synergy = weightRule.calculate(card1, card2, tags1, tags2);
+      } catch (error) {
+        console.error(`Error in weight rule "${ruleName}":`, error);
+        continue;
+      }
+
+      if (synergy > 0) {
+        // Store synergy in both directions
+        if (!synergies[card1Id]) {
+          synergies[card1Id] = [];
+        }
+        synergies[card1Id].push({
+          targetId: card2Id,
+          points: synergy
+        });
+
+        if (!synergies[card2Id]) {
+          synergies[card2Id] = [];
+        }
+        synergies[card2Id].push({
+          targetId: card1Id,
+          points: synergy
+        });
+      }
+    }
+
+    // Sort by synergy points descending for each card
+    for (const cardId in synergies) {
+      synergies[cardId].sort((a, b) => b.points - a.points);
+    }
+
+    return synergies;
   }
 };
 

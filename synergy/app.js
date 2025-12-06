@@ -113,8 +113,10 @@ const SynergyApp = {
    * Calculate all synergies using SynergyRules and SynergyWeighter modules
    */
   calculateAllSynergies() {
+    // Initialize synergies structure
     this.state.synergies = {};
 
+    // For each card, calculate pairwise synergies with all other cards
     for (let i = 0; i < this.state.cards.length; i++) {
       const card1 = this.state.cards[i];
       const tags1 = this.state.cardTags[card1.id] || {};
@@ -124,21 +126,18 @@ const SynergyApp = {
       }
 
       for (let j = 0; j < this.state.cards.length; j++) {
-        if (i === j) continue;
+        if (i === j) continue; // Skip self-comparison
 
         const card2 = this.state.cards[j];
         const tags2 = this.state.cardTags[card2.id] || {};
 
-        // Step 1: Calculate raw synergy points using SynergyRules
-        const rawSynergy = window.SynergyRules.calculateSynergy(card1, card2, tags1, tags2);
+        // Calculate pairwise synergy using weight rules
+        const synergy = window.SynergyWeighter.calculatePairSynergy(card1, card2, tags1, tags2);
 
-        // Step 2: Apply weights using SynergyWeighter to get final weighted synergy
-        const weightedSynergy = window.SynergyWeighter.applyWeights(rawSynergy, tags1, tags2);
-
-        if (weightedSynergy > 0) {
+        if (synergy > 0) {
           this.state.synergies[card1.id].push({
             targetId: card2.id,
-            points: weightedSynergy
+            points: synergy
           });
         }
       }
@@ -146,6 +145,8 @@ const SynergyApp = {
       // Sort by synergy points descending
       this.state.synergies[card1.id].sort((a, b) => b.points - a.points);
     }
+
+    console.log("Synergies calculated:", this.state.synergies);
 
     // Step 3: Build graph using GraphBuilder
     this.buildGraphData();
@@ -286,19 +287,23 @@ const SynergyApp = {
     html += `
         </div>
         
-        <h4>协同卡牌 (Top 5)</h4>
-        <div class="synergies-list">
+        <h4>协同规则</h4>
+        <div class="rule-synergies-list">
     `;
 
-    synergies.slice(0, 5).forEach(syn => {
-      const targetCard = this.state.cards.find(c => c.id === syn.targetId);
-      if (targetCard) {
-        html += `<div class="synergy-item">
-          <span>${syn.targetId}</span>
-          <span class="synergy-points">+${Math.round(syn.points)}</span>
-        </div>`;
-      }
-    });
+    if (synergies.length > 0) {
+      synergies.slice(0, 5).forEach(syn => {
+        const targetCard = this.state.cards.find(c => c.id === syn.targetId);
+        if (targetCard) {
+          html += `<div class="rule-synergy-item">
+            <span><strong>${targetCard.id}</strong></span>
+            <span class="synergy-points">协同点: ${Math.round(syn.points)}</span>
+          </div>`;
+        }
+      });
+    } else {
+      html += `<p>无协同规则</p>`;
+    }
 
     html += `
         </div>

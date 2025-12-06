@@ -1,116 +1,102 @@
 /**
  * SynergyRules.js
- * Contains hard-coded synergy rules and calculates base synergy points
+ * Contains hard-coded synergy rules and finds matching cards based on tag criteria
  */
 
 const SynergyRules = {
   /**
    * Hard-coded synergy rule definitions
-   * Each rule has a calculate function that returns synergy points
+   * Each rule has a match function that finds all cards matching the rule criteria
    */
   rules: [
     {
+      rule: "任务流",
+      description: "Task Chain synergy: cards with 人族任务流 or 人族任务流核心 tags",
+      match: (allCards, cardTagsMap) => {
+        return allCards.filter(card => {
+          const tags = cardTagsMap[card.id] || {};
+          return tags["人族任务流"] || tags["人族任务流核心"];
+        });
+      }
+    },
+    {
       rule: "same_race",
-      description: "Same-race synergy: both cards of same race get a bonus",
-      calculate: (card1, card2, tags1, tags2) => {
-        if (card1.race !== card2.race) return 0;
-        const raceTag = card1.race;
-        const val1 = tags1[raceTag] || 0;
-        const val2 = tags2[raceTag] || 0;
-        return (val1 + val2) * 2; // shared race multiplier
+      description: "Same-race synergy: cards of the same race",
+      match: (allCards, cardTagsMap, focusCard) => {
+        if (!focusCard) return [];
+        return allCards.filter(card => card.race === focusCard.race);
       }
     },
     {
       rule: "shared_tag",
-      description: "Shared tag synergy: if both have same tag, combine values",
-      calculate: (card1, card2, tags1, tags2) => {
-        let synergy = 0;
-        for (const tag in tags1) {
-          if (tag in tags2 && tag !== card1.race && tag !== card2.race) {
-            synergy += (tags1[tag] + tags2[tag]) * 1.5;
+      description: "Shared tag synergy: cards sharing a common tag",
+      match: (allCards, cardTagsMap, focusCard) => {
+        if (!focusCard) return [];
+        const focusTags = cardTagsMap[focusCard.id] || {};
+        return allCards.filter(card => {
+          const cardTags = cardTagsMap[card.id] || {};
+          for (const tag in focusTags) {
+            if (tag in cardTags && tag !== focusCard.race && tag !== "pack") {
+              return true;
+            }
           }
-        }
-        return synergy;
+          return false;
+        });
       }
     },
     {
-      rule: "tag_combos",
-      description: "Tag combination synergy: specific tag combos get bonus",
-      calculate: (card1, card2, tags1, tags2) => {
-        let synergy = 0;
-
-        // 英雄 + 单位 combo: heroes support units
-        if ((tags1["英雄"] && tags2["单位"]) || (tags2["英雄"] && tags1["单位"])) {
-          const heroVal = (tags1["英雄"] || 0) + (tags2["英雄"] || 0);
-          const unitVal = (tags1["单位"] || 0) + (tags2["单位"] || 0);
-          synergy += (heroVal + unitVal) * 1.3;
-        }
-
-        // 飞行 + 飞行 combo: air superiority
-        if (tags1["飞行"] && tags2["飞行"]) {
-          synergy += (tags1["飞行"] + tags2["飞行"]) * 2;
-        }
-
-        // 法术 + 近战 combo: complementary tactics
-        if ((tags1["法术"] && tags2["近战"]) || (tags2["法术"] && tags1["近战"])) {
-          const spellVal = (tags1["法术"] || 0) + (tags2["法术"] || 0);
-          const meleeVal = (tags1["近战"] || 0) + (tags2["近战"] || 0);
-          synergy += (spellVal + meleeVal) * 1.2;
-        }
-
-        // 建筑 + 单位 combo: infrastructure support
-        if ((tags1["建筑"] && tags2["单位"]) || (tags2["建筑"] && tags1["单位"])) {
-          const buildVal = (tags1["建筑"] || 0) + (tags2["建筑"] || 0);
-          const unitVal = (tags1["单位"] || 0) + (tags2["单位"] || 0);
-          synergy += (buildVal + unitVal) * 0.8;
-        }
-
-        return synergy;
+      rule: "air_superiority",
+      description: "Air superiority synergy: cards with 飞行 tag",
+      match: (allCards, cardTagsMap) => {
+        return allCards.filter(card => {
+          const tags = cardTagsMap[card.id] || {};
+          return tags["飞行"];
+        });
       }
     }
   ],
 
   /**
-   * Calculate synergy points between two cards based on all rules
-   * @param {Object} card1 - First card object
-   * @param {Object} card2 - Second card object
-   * @param {Object} tags1 - Tags of first card (cardId -> tags mapping)
-   * @param {Object} tags2 - Tags of second card (cardId -> tags mapping)
-   * @returns {number} Raw synergy points (before multiplier weighting)
+   * Find all cards matching a specific rule
+   * @param {string} ruleName - Name of the rule to match
+   * @param {Array} allCards - All cards to search through
+   * @param {Object} cardTagsMap - Mapping of cardId -> tags
+   * @param {Object} focusCard - Optional card to use as context for relative matching
+   * @returns {Array} Array of cards matching the rule
    */
-  calculateSynergy(card1, card2, tags1, tags2) {
-    // Ensure tag values used for numeric calculations are numbers.
-    // Some tag sources include non-numeric entries (e.g. "pack": "核心").
-    // Convert numeric-like values to numbers and treat others as 0 to avoid NaN.
-    const normalizeTags = (tags) => {
-      const out = {};
-      for (const k in tags) {
-        const v = tags[k];
-        const n = Number(v);
-        out[k] = Number.isFinite(n) ? n : 0;
-      }
-      return out;
-    };
-
-    const nTags1 = normalizeTags(tags1 || {});
-    const nTags2 = normalizeTags(tags2 || {});
-
-    let totalSynergy = 0;
-    for (const ruleObj of this.rules) {
-      const synergy = ruleObj.calculate(card1, card2, nTags1, nTags2);
-      totalSynergy += synergy;
+  findMatchingCards(ruleName, allCards, cardTagsMap, focusCard = null) {
+    const ruleObj = this.rules.find(r => r.rule === ruleName);
+    if (!ruleObj) {
+      console.warn(`Rule "${ruleName}" not found`);
+      return [];
     }
 
-    return totalSynergy;
+    try {
+      return ruleObj.match(allCards, cardTagsMap, focusCard) || [];
+    } catch (error) {
+      console.error(`Error matching rule "${ruleName}":`, error);
+      return [];
+    }
   },
 
   /**
-   * Get all available rules
-   * @returns {Array} Array of rule definitions
+   * Find all cards matching all rules and return grouped results
+   * @param {Array} allCards - All cards to search through
+   * @param {Object} cardTagsMap - Mapping of cardId -> tags
+   * @returns {Object} Object mapping ruleName -> matchedCards array
    */
-  getRules() {
-    return this.rules;
-  }
+  findAllMatches(allCards, cardTagsMap) {
+    const results = {};
+    for (const ruleObj of this.rules) {
+      try {
+        results[ruleObj.rule] = ruleObj.match(allCards, cardTagsMap) || [];
+      } catch (error) {
+        console.error(`Error matching rule "${ruleObj.rule}":`, error);
+        results[ruleObj.rule] = [];
+      }
+    }
+    return results;
+  } 
 };
 
 // Global export

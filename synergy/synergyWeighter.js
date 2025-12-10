@@ -15,7 +15,7 @@ const SynergyWeighter = {
       description: "Terran race weight: bonus for two Terran cards",
       calculate: (card1, card2, tags1, tags2) => {
         if (card1.race === "Terran" && card2.race === "Terran") {
-          return 00;
+          return 0;
         }
         return 0;
       }

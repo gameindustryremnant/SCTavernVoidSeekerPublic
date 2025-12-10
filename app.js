@@ -202,7 +202,7 @@ const App = {
         value: Number(c.value),
         isCoreSet: c.isCoreSet
       };
-    }).filter(c=>RACES.includes(c.race) && Number.isFinite(c.level) && c.level>=1 && c.level<=6 && Number.isFinite(c.number) && Number.isFinite(c.value));
+    }).filter(c=>RACES.includes(c.race) && Number.isFinite(c.level) && c.level>=0 && c.level<=6 && Number.isFinite(c.number) && Number.isFinite(c.value));
     const dropped = cards.length - normalized.length;
     this.state.cards = normalized;
     this.state.guesses = [];
@@ -450,7 +450,7 @@ function normalizeRace(input){
 function normalizeLevel(n){
   const x = Math.floor(Number(n));
   if(!Number.isFinite(x)) return NaN;
-  if(x < 1) return 1;
+  if(x <= 0) return 0;
   if(x > 6) return 6;
   return x;
 }

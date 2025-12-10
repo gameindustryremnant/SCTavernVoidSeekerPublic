@@ -16,7 +16,8 @@ const BUILTIN_SET_FILES = {
   expPack5: 'TempData/pack5ChongZhuangShangZhen.json',
   expPack6: 'TempData/pack6QiongBingDuWu.json',
   expPack7: 'TempData/pack7YiNianZhiCha.json',
-  expPack8: 'TempData/pack8MuChangZhiZhan.json'
+  expPack8: 'TempData/pack8MuChangZhiZhan.json',
+  expPack9: 'TempData/pack9TongLuanShuangGou.json',
 };
 
 const App = {
@@ -46,6 +47,7 @@ const App = {
       expPack6Toggle: document.getElementById('expPack6Toggle'),
       expPack7Toggle: document.getElementById('expPack7Toggle'),
       expPack8Toggle: document.getElementById('expPack8Toggle'),
+      expPack9Toggle: document.getElementById('expPack9Toggle'),
       datasetInfo: document.getElementById('datasetInfo'),
       raceSelect: document.getElementById('raceSelect'),
       levelSelect: document.getElementById('levelSelect'),
@@ -69,7 +71,8 @@ const App = {
       ['expPack5', this.els.expPack5Toggle],
       ['expPack6', this.els.expPack6Toggle],
       ['expPack7', this.els.expPack7Toggle],
-      ['expPack8', this.els.expPack8Toggle]
+      ['expPack8', this.els.expPack8Toggle],
+      ['expPack9', this.els.expPack9Toggle],
     ];
     toggles.forEach(([key, el])=>{
       if(!el) return;
@@ -121,7 +124,8 @@ const App = {
     if(this.els.expPack6Toggle && this.els.expPack6Toggle.checked) selectedKeys.push('expPack6');
     if(this.els.expPack7Toggle && this.els.expPack7Toggle.checked) selectedKeys.push('expPack7');
     if(this.els.expPack8Toggle && this.els.expPack8Toggle.checked) selectedKeys.push('expPack8');
-
+    if(this.els.expPack9Toggle && this.els.expPack9Toggle.checked) selectedKeys.push('expPack9');
+    
     try{
       const datasets = await Promise.all(selectedKeys.map(async (k)=>{
         const res = await fetch(BUILTIN_SET_FILES[k], { cache:'no-cache' });

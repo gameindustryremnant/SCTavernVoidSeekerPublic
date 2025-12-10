@@ -17,7 +17,7 @@ const BUILTIN_SET_FILES = {
   expPack6: 'data/pack6QiongBingDuWu.json',
   expPack7: 'data/pack7YiNianZhiCha.json',
   expPack8: 'data/pack8MuChangZhiZhan.json',
-  expPack9: 'data/pack9TongLuanShuangGou.json'  
+  expPackDuo1: 'data/packDuo1TongLuanShuangGou.json'  
 };
 
 const App = {
@@ -47,7 +47,7 @@ const App = {
       expPack6Toggle: document.getElementById('expPack6Toggle'),
       expPack7Toggle: document.getElementById('expPack7Toggle'),
       expPack8Toggle: document.getElementById('expPack8Toggle'),
-      expPack9Toggle: document.getElementById('expPack9Toggle'),
+      expPackDuo1Toggle: document.getElementById('expPackDuo1Toggle'),
       datasetInfo: document.getElementById('datasetInfo'),
       raceRow: document.getElementById('raceRow'),
       levelRow: document.getElementById('levelRow'),
@@ -73,7 +73,7 @@ const App = {
       ['expPack6', this.els.expPack6Toggle],
       ['expPack7', this.els.expPack7Toggle],
       ['expPack8', this.els.expPack8Toggle],
-      ['expPack9', this.els.expPack9Toggle],
+      ['expPackDuo1Toggle', this.els.expPackDuo1Toggle],
     ];
     toggles.forEach(([key, el])=>{
       if(!el) return;
@@ -112,7 +112,7 @@ const App = {
     if(this.els.expPack6Toggle && this.els.expPack6Toggle.checked) selectedKeys.push('expPack6');
     if(this.els.expPack7Toggle && this.els.expPack7Toggle.checked) selectedKeys.push('expPack7');
     if(this.els.expPack8Toggle && this.els.expPack8Toggle.checked) selectedKeys.push('expPack8');
-    if(this.els.expPack9Toggle && this.els.expPack9Toggle.checked) selectedKeys.push('expPack9');
+    if(this.els.expPackDuo1Toggle && this.els.expPackDuo1Toggle.checked) selectedKeys.push('expPackDuo1');
     
     try{
       const datasets = await Promise.all(selectedKeys.map(async (k)=>{

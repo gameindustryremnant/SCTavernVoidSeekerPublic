@@ -72,7 +72,7 @@
     
     { "id": "陆军学院", "race": "Terran", "level": 4, "number": 6,  "value": 1350 },
     { "id": "护航中队", "race": "Terran", "level": 4, "number": 4, "value": 760 },
-    { "id": "枪兵坦克", "race": "Terran", "level": 4, "number": 11,  "value": 950 },
+    { "id": "步坦协同", "race": "Terran", "level": 4, "number": 11,  "value": 950 },
     { "id": "交叉火力", "race": "Terran", "level": 4, "number": 6,  "value": 1150 },
     { "id": "空军学院", "race": "Terran", "level": 4, "number": 4,  "value": 825 },
     

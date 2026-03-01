@@ -16,8 +16,9 @@
     expPack5: 'data/pack5ChongZhuangShangZhen.json',
     expPack6: 'data/pack6QiongBingDuWu.json',
     expPack7: 'data/pack7YiNianZhiCha.json',
-    expPack8: 'data/pack8MuChangZhiZhan.json',
+    expPack8: 'data/pack8MuChaoZhiZhan.json',
     expPack9: 'data/pack9ShenJingBaiZhan.json',
+    expPack10: 'data/pack10BiTeKuangChao.json',
     expPackDuo1: 'data/packDuo1TongLuanShuangGou.json'
   };
 
@@ -49,6 +50,7 @@
         expPack7Toggle: document.getElementById('expPack7Toggle'),
         expPack8Toggle: document.getElementById('expPack8Toggle'),
         expPack9Toggle: document.getElementById('expPack9Toggle'),
+        expPack10Toggle: document.getElementById('expPack10Toggle'),
         expPackDuo1Toggle: document.getElementById('expPackDuo1Toggle'),
         datasetInfo: document.getElementById('datasetInfo'),
         raceRow: document.getElementById('raceRow'),
@@ -76,6 +78,7 @@
         ['expPack7', this.els.expPack7Toggle],
         ['expPack8', this.els.expPack8Toggle],
         ['expPack9', this.els.expPack9Toggle],
+        ['expPack10', this.els.expPack10Toggle],
         ['expPackDuo1Toggle', this.els.expPackDuo1Toggle],
       ];
       toggles.forEach(([key, el]) => {
@@ -116,6 +119,7 @@
       if (this.els.expPack7Toggle && this.els.expPack7Toggle.checked) selectedKeys.push('expPack7');
       if (this.els.expPack8Toggle && this.els.expPack8Toggle.checked) selectedKeys.push('expPack8');
       if (this.els.expPack9Toggle && this.els.expPack9Toggle.checked) selectedKeys.push('expPack9');
+      if (this.els.expPack10Toggle && this.els.expPack10Toggle.checked) selectedKeys.push('expPack10');
       if (this.els.expPackDuo1Toggle && this.els.expPackDuo1Toggle.checked) selectedKeys.push('expPackDuo1');
 
       try {
